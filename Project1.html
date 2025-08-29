@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI健康计算器</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: row;
+            min-height: 450px;
+        }
+
+        @media (max-width: 768px) {
+            .card-content {
+                flex-direction: column;
+            }
+        }
+
+        .input-section {
+            flex: 1;
+            padding: 40px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .result-section {
+            flex: 1;
+            padding: 40px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 1rem;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .input-container i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 1.1rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px 50px 15px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2d3748;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="number"]::placeholder {
+            color: #a0aec0;
+        }
+
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .bmi-result {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .bmi-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .bmi-category {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        .underweight {
+            background-color: #ffeaa7;
+            color: #d97706;
+        }
+
+        .normal {
+            background-color: #c6f6d5;
+            color: #059669;
+        }
+
+        .overweight {
+            background-color: #fed7d7;
+            color: #e53e3e;
+        }
+
+        .obese {
+            background-color: #feb2b2;
+            color: #c53030;
+        }
+
+        .bmi-scale {
+            margin-top: 30px;
+        }
+
+        .scale-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+
+        .scale-visual {
+            height: 20px;
+            background: linear-gradient(90deg, #63b3ed 0%, #68d391 30%, #f6e05e 60%, #fc8181 100%);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .scale-marker {
+            position: absolute;
+            top: -5px;
+            width: 4px;
+            height: 30px;
+            background: #2d3748;
+            border-radius: 2px;
+            transform: translateX(-50%);
+            transition: left 0.5s ease;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            font-size: 0.95rem;
+        }
+
+        .instructions p {
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        .info-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #a0aec0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .info-icon:hover {
+            color: #667eea;
+        }
+
+        .result-placeholder {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 1.1rem;
+            margin: 60px 0;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BMI健康计算器</h1>
+            <p>快速计算您的身体质量指数，了解健康状况</p>
+        </header>
+        
+        <div class="card">
+            <div class="card-content">
+                <div class="input-section">
+                    <div class="input-group">
+                        <label for="num1">身高</label>
+                        <div class="input-container">
+                            <i class="fas fa-ruler-vertical"></i>
+                            <input id="num1" type="number" placeholder="请输入身高" v-model="height" min="0" step="0.01">
+                            <span class="unit">米</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="num2">体重</label>
+                        <div class="input-container">
+                            <i class="fas fa-weight"></i>
+                            <input id="num2" type="number" placeholder="请输入体重" v-model="weight" min="0" step="0.1">
+                            <span class="unit">千克</span>
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <p><i class="fas fa-info-circle"></i> BMI（身体质量指数）是衡量体重与身高比例的常用指标</p>
+                        <p><i class="fas fa-lightbulb"></i> 输入您的身高和体重即可自动计算结果</p>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <i class="fas fa-info-circle info-icon"></i>
+                    
+                    <div v-if="weight > 0 && height > 0" class="bmi-result">
+                        <div class="bmi-value">{{BMI.toFixed(1)}}</div>
+                        <div :class="['bmi-category', 
+                                    BMI < 18.5 ? 'underweight' : 
+                                    BMI < 24.9 ? 'normal' : 
+                                    BMI < 29.9 ? 'overweight' : 'obese']">
+                            {{BMI < 18.5 ? '体重过轻' : 
+                              BMI < 24.9 ? '正常体重' : 
+                              BMI < 29.9 ? '超重' : '肥胖'}}
+                        </div>
+                        
+                        <div class="bmi-scale">
+                            <div class="scale-title">BMI指数范围</div>
+                            <div class="scale-visual">
+                                <div class="scale-marker" :style="{ left: markerPosition + '%' }"></div>
+                            </div>
+                            <div class="scale-labels">
+                                <span>偏瘦</span>
+                                <span>健康</span>
+                                <span>超重</span>
+                                <span>肥胖</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-else class="result-placeholder">
+                        <i class="fas fa-calculator fa-3x"></i>
+                        <p>请输入身高和体重以计算BMI指数</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 BMI健康计算器 | By面灵气酱 基于Vue 3开发</p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script type="text/javascript">
+        const vm = Vue.createApp({
+            data() {
+                return {
+                    height: 0,
+                    weight: 0,
+                    BMI: 0
+                }
+            },
+            computed: {
+                markerPosition() {
+                    if (this.BMI <= 0) return 0;
+                    // BMI范围从10到40，将BMI值映射到0-100%的位置
+                    const clampedBMI = Math.min(Math.max(this.BMI, 10), 40);
+                    return ((clampedBMI - 10) / 30) * 100;
+                }
+            },
+            watch: {
+                height: function(val) {
+                    if (val > 0 && this.weight > 0) {
+                        this.BMI = this.weight / (val * val);
+                    } else {
+                        this.BMI = 0;
+                    }
+                },
+                weight: function(val) {
+                    if (val > 0 && this.height > 0) {
+                        this.BMI = val / (this.height * this.height);
+                    } else {
+                        this.BMI = 0;
+                    }
+                }
+            }
+        }).mount(".container");
+    </script>
+</body>
+</html>
