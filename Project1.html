@@ -299,7 +299,7 @@
                         <label for="num1">身高</label>
                         <div class="input-container">
                             <i class="fas fa-ruler-vertical"></i>
-                            <input id="num1" type="number" placeholder="请输入身高" v-model="height" min="0" step="0.01">
+                            <input id="num1" type="number" placeholder="请输入身高" v-model="height" min="0" max="999" step="0.01" @keydown="handleHeightKeydown">
                             <span class="unit">米</span>
                         </div>
                     </div>
@@ -308,7 +308,7 @@
                         <label for="num2">体重</label>
                         <div class="input-container">
                             <i class="fas fa-weight"></i>
-                            <input id="num2" type="number" placeholder="请输入体重" v-model="weight" min="0" step="0.1">
+                            <input id="num2" type="number" placeholder="请输入体重" v-model="weight" min="0" max="999" step="0.1" @keydown="handleWeightKeydown">
                             <span class="unit">千克</span>
                         </div>
                     </div>
@@ -378,8 +378,40 @@
                     return ((clampedBMI - 10) / 30) * 100;
                 }
             },
+            methods: {
+                // 使用keydown事件在字符输入前就拦截运算符
+                handleHeightKeydown(event) {
+                    const key = event.key;
+                    const operators = ['+', '-', '*', '/', '×', '÷'];
+                    
+                    // 如果按下的是运算符键，阻止默认行为
+                    if (operators.includes(key)) {
+                        event.preventDefault();
+                        return false;
+                    }
+                },
+                
+                handleWeightKeydown(event) {
+                    const key = event.key;
+                    const operators = ['+', '-', '*', '/', '×', '÷'];
+                    
+                    // 如果按下的是运算符键，阻止默认行为
+                    if (operators.includes(key)) {
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+            },
+            
             watch: {
                 height: function(val) {
+                    // 其他验证逻辑保持不变
+                    if (val > 999) {
+                        this.height = 999;
+                    }
+                    if (val < 0) {
+                        this.height = 0;
+                    }
                     if (val > 0 && this.weight > 0) {
                         this.BMI = this.weight / (val * val);
                     } else {
@@ -387,6 +419,13 @@
                     }
                 },
                 weight: function(val) {
+                    // 其他验证逻辑保持不变
+                    if (val > 999) {
+                        this.weight = 999;
+                    }
+                    if (val < 0) {
+                        this.weight = 0;
+                    }
                     if (val > 0 && this.height > 0) {
                         this.BMI = val / (this.height * this.height);
                     } else {
